@@ -184,10 +184,60 @@ app.get('/wallet', async (req, res) => {
   
   try{
     const wallet = await db.collection('wallet').find({user:session.email}).toArray()
-    console.log(wallet)
     res.send(wallet);
   }catch (error){
     res.status(401)
   }
 })
+
+app.delete('/wallet', async (req, res) => {
+  const { authorization } = req.headers
+  const token = authorization?.replace('Bearer ', '')
+  const session = await db.collection('sessions').findOne({token})
+
+  if (!session){
+    return res.sendStatus(401)
+  }
+  
+  try{
+    await db.collection('sessions').deleteOne({token: session.token})
+    res.send("Usuário deslogado com sucesso").status(200)
+
+  }catch (error){
+    res.send(error)
+}
+})
+
+app.delete('/wallet/:id', async (req, res) => {
+  const { authorization } = req.headers
+  const token = authorization?.replace('Bearer ', '')
+  const session = await db.collection('sessions').findOne({token})
+  const id = req.params.id;
+  if (!session){
+    return res.sendStatus(401)
+  }
+
+  try{
+    const valueToDelete = await db.collection('wallet').findOne({ _id: new ObjectId(id) })
+
+    if (!valueToDelete){
+      res.sendStatus(404);
+      return;
+    }
+    {/*
+    console.log(valueToDelete._id)
+    if(valueToDelete._id !== new ObjectId(id)){
+      res.sendStatus("aqui", 401);
+      return;
+    }*/}
+
+    await db.collection('wallet').deleteOne({ _id: ObjectId(id)})
+    res.send("Valor deletado com sucesso").status(200)
+
+  }catch (error){
+    res.send(error)
+  }
+});
+
+
 app.listen(5000 ,  () => console.log('server running - port 5000'));
