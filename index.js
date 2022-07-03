@@ -18,8 +18,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
-
 app.use(json());
 
 const mongoClient = new MongoClient(process.env.MONGO_URI);
@@ -101,7 +99,7 @@ app.post("/login", async (req, res)=> {
 
       await db.collection("sessions").insertOne(
         {
-        userId: registeredUser._id,
+        email:registeredUser.email,
         token
       })
 
@@ -133,7 +131,7 @@ app.post('/addcredit', async (req, res) => {
   try{
     await db.collection('wallet').insertOne(
     {
-      user: session.userId,
+      user: session.email,
       amount: newCredit.amount,
       discription: newCredit.discription,
       type: "credit",
@@ -160,16 +158,16 @@ app.post('/adddebit', async (req, res) => {
 
   try{
   
-  await db.collection('amount').insertOne(
+  await db.collection('wallet').insertOne(
     {
-      user: session.userId,
+      user: session.email,
       amount: newDebit.amount,
       discription: newDebit.discription,
       type: "debit",
       date: day.format("DD/MM")
     }
   )
-    res.status(200).send("Valor cadastrado com sucesso")
+    res.status(201).send("Valor cadastrado com sucesso")
   }catch (error){
     res.sendStatus(error)
   }
@@ -181,12 +179,12 @@ app.get('/wallet', async (req, res) => {
   const session = await db.collection('sessions').findOne({token})
   
   if (!session){
-        return res.sendStatus(401)
+      return res.sendStatus(401)
   }
   
   try{
-  
-    const wallet = await db.collection('amount').find({userId : session.userId})
+    const wallet = await db.collection('wallet').find({user:session.email}).toArray()
+    console.log(wallet)
     res.send(wallet);
   }catch (error){
     res.status(401)
