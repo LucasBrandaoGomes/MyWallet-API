@@ -1,7 +1,7 @@
 import db from "../db.js";
 import dayjs from "dayjs";
-import Joi from "joi";
-
+//import Joi from "joi";
+import { ObjectId } from "mongodb";
 
 export async function AddCredit(req, res){
   
@@ -104,20 +104,13 @@ export async function DeleteWalletValues(req, res){
     }
     try{
 
-         {/*const valueToDelete = await db.collection('wallet').findOne({_id: new ObjectId(id)})
-      console.log(valueToDelete)
+      const valueToDelete = await db.collection('wallet').findOne({_id: new ObjectId(id)})
       
       if (!valueToDelete){
         res.sendStatus(404);
         return;
       }
-   
-      console.log(valueToDelete._id)
-      if(valueToDelete._id !== new ObjectId(id)){
-        res.sendStatus("aqui", 401);
-        return;
-      }*/}
-      console.log("passou")
+
       await db.collection('wallet').deleteOne({ _id: ObjectId(id)})
       res.send("Valor deletado com sucesso").status(200)
   
@@ -142,4 +135,4 @@ export async function Logout(req, res){
     }catch (error){
       res.send(error)
   }
-}
+  }
