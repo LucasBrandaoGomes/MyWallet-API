@@ -4,16 +4,11 @@ import dayjs from "dayjs";
 import { ObjectId } from "mongodb";
 
 export async function AddCredit(req, res){
-  
+
+    const session = res.locals.session
     const newCredit = req.body;
-    const { authorization } = req.headers
-    const token = authorization?.replace('Bearer ', '')
-    const session = await db.collection('sessions').findOne({token})
     const day = dayjs().locale('pt-br')
-    
-    if (!session){
-      return res.sendStatus(401)
-    }
+
 
     {/*const newCreditSchema = Joi.object(
         {
@@ -34,7 +29,7 @@ export async function AddCredit(req, res){
       await db.collection('wallet').insertOne(
       {
         user: session.email,
-        amount: newCredit.amount.parseFloat().toFixed(2),
+        amount: newCredit.amount,
         discription: newCredit.discription,
         type: "credit",
         date: day.format("DD/MM")
@@ -48,16 +43,10 @@ export async function AddCredit(req, res){
 
 export async function AddDebit(req, res){
   
+    const session = res.locals.session
     const newDebit = req.body;
-    const { authorization } = req.headers
-    const token = authorization?.replace('Bearer ', '')
-    const session = await db.collection('sessions').findOne({token})
     const day = dayjs().locale('pt-br')
     
-    if (!session){
-      return res.sendStatus(401)
-    }
-  
     try{
     
     await db.collection('wallet').insertOne(
@@ -76,14 +65,9 @@ export async function AddDebit(req, res){
   }
 
 export async function GetWalletValues(req, res){
-    const { authorization } = req.headers
-    const token = authorization?.replace('Bearer ', '')
-    const session = await db.collection('sessions').findOne({token})
     
-    if (!session){
-        return res.sendStatus(401)
-    }
-    
+  const session = res.locals.session
+  
     try{
       const wallet = await db.collection('wallet').find({user:session.email}).toArray()
       res.send(wallet);
@@ -93,15 +77,9 @@ export async function GetWalletValues(req, res){
   }
 
 export async function DeleteWalletValues(req, res){
-    const { authorization } = req.headers
-    const token = authorization?.replace('Bearer ', '')
-    const session = await db.collection('sessions').findOne({token})
+    
     const id = req.params.id;
    
-    
-    if (!session){
-      return res.sendStatus(401)
-    }
     try{
 
       const valueToDelete = await db.collection('wallet').findOne({_id: new ObjectId(id)})
@@ -120,14 +98,9 @@ export async function DeleteWalletValues(req, res){
   };
 
 export async function Logout(req, res){
-    const { authorization } = req.headers
-    const token = authorization?.replace('Bearer ', '')
-    const session = await db.collection('sessions').findOne({token})
-  
-    if (!session){
-      return res.sendStatus(401)
-    }
     
+    const session = res.locals.session
+
     try{
       await db.collection('sessions').deleteOne({token: session.token})
       res.send("Usuário deslogado com sucesso").status(200)

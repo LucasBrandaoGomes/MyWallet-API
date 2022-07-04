@@ -3,6 +3,7 @@ import  cors  from "cors"
 import dotenv from 'dotenv';
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { tokenValidateMidleware } from "./midlewares/tokenValidateMidleware.js";
 
 dotenv.config();
 const app = express()
@@ -20,7 +21,7 @@ app.use(authRoutes)
 
 // userRoutes
 
-app.use(userRoutes) 
+app.use(tokenValidateMidleware, userRoutes) 
 
 const PORT = process.env.PORT;
 app.listen(PORT ,  () => console.log(`server running - port ${PORT}`));
