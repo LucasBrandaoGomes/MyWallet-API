@@ -80,25 +80,27 @@ export async function DeleteWalletValues(req, res){
     const token = authorization?.replace('Bearer ', '')
     const session = await db.collection('sessions').findOne({token})
     const id = req.params.id;
+   
+    
     if (!session){
       return res.sendStatus(401)
     }
-  
     try{
-      const valueToDelete = await db.collection('wallet').findOne({ _id: new ObjectId(id) })
-        console.log(valueToDelete)
-        console.log(valueToDelete._id)
+
+         {/*const valueToDelete = await db.collection('wallet').findOne({_id: new ObjectId(id)})
+      console.log(valueToDelete)
+      
       if (!valueToDelete){
         res.sendStatus(404);
         return;
       }
-      {/*
+   
       console.log(valueToDelete._id)
       if(valueToDelete._id !== new ObjectId(id)){
         res.sendStatus("aqui", 401);
         return;
       }*/}
-      
+      console.log("passou")
       await db.collection('wallet').deleteOne({ _id: ObjectId(id)})
       res.send("Valor deletado com sucesso").status(200)
   

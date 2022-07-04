@@ -1,8 +1,9 @@
 import express, { json } from "express"
 import  cors  from "cors"
 import dotenv from 'dotenv';
-import { SignIn, SignUp } from "./controllers/authControllers.js";
+import authRoutes from "./routes/authRoutes.js";
 import { AddCredit, AddDebit, DeleteWalletValues, GetWalletValues, Logout } from "./controllers/userControllers.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 const app = express()
@@ -14,18 +15,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(json());
 
-// authCOntrollers
+// authRoutes
 
-app.post("/signup", SignUp)
-app.post("/login", SignIn)
+app.use(authRoutes)
 
-//userCntrollers
+// userRoutes
 
-app.post('/addcredit', AddCredit) 
-app.post('/adddebit', AddDebit)
-app.get('/wallet', GetWalletValues)
-app.delete('/wallet', Logout)
-app.delete('/wallet/:id', DeleteWalletValues) 
+app.use(userRoutes) 
 
 const PORT = process.env.PORT;
 app.listen(PORT ,  () => console.log(`server running - port ${PORT}`));
