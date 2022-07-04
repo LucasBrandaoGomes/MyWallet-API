@@ -1,5 +1,7 @@
 import db from "../db.js";
 import dayjs from "dayjs";
+import Joi from "joi";
+
 
 export async function AddCredit(req, res){
   
@@ -12,12 +14,27 @@ export async function AddCredit(req, res){
     if (!session){
       return res.sendStatus(401)
     }
+
+    {/*const newCreditSchema = Joi.object(
+        {
+          amount: Joi.number(),
+          discription: Joi.string()
+        });
+  
+    const newCreditValidation = newCreditSchema.validate(req.body)
+    const {error} = newCreditValidation
+
+    if (error){
+      const errorMsgs = error.details.map(err => err.message)
+      res.status(422).send(errorMsgs)
+      return;
+    }*/}
     
     try{
       await db.collection('wallet').insertOne(
       {
         user: session.email,
-        amount: newCredit.amount,
+        amount: newCredit.amount.parseFloat().toFixed(2),
         discription: newCredit.discription,
         type: "credit",
         date: day.format("DD/MM")
